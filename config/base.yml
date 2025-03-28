@@ -1,0 +1,13 @@
+server:
+  port: 8081
+
+auth:
+  jwtSecret: superSecure
+
+database:
+  host: ${DB_HOST:-localhost}
+  name: companyapi
+  port: 26257
+  password: root
+  user: root
+  sslmode: disable

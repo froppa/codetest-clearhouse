@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  cockroachdb:
+    image: cockroachdb/cockroach:v25.1.2
+    command: start-single-node --insecure
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - cockroachdb-data:/cockroach/cockroach-data
+      - ./migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql
+    networks:
+      - company
+
+  service:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8081:8081"
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+    restart: always
+    networks:
+      - company
+
+networks:
+  company:
+    driver: bridge
+
+volumes:
+  cockroachdb-data:
