@@ -8,15 +8,18 @@ if ! podman network exists $NETWORK_NAME; then
   podman network create $NETWORK_NAME
 fi
 
-podman build -t service .
-podman run -d \
+if ! podman image exists service:latest; then
+  podman build -t service .
+fi
+
+podman run -d --replace \
   --name cockroachdb \
   --network $NETWORK_NAME \
   -p 26257:26257 \
   -p 8080:8080 \
   -v cockroachdb-data:/cockroach/cockroach-data \
   -v ./migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql \
-      cockroachdb/cockroach:v25.1.2 start-single-node --insecure
+  cockroachdb/cockroach:v25.1.2 start-single-node --insecure
 
 echo "Waiting for CockroachDB to become healthy..."
 for i in {1..5}; do
@@ -28,11 +31,9 @@ for i in {1..5}; do
   sleep 10
 done
 
-# Start the service container
-podman run -d \
+podman run --replace \
   --name service \
   --network $NETWORK_NAME \
   -p 8081:8081 \
-  -e DB_HOST=cockroachdb \
+  --env DATABASE_HOST=cockroachdb \
   service:latest
-

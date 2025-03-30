@@ -29,6 +29,7 @@ func ProvideConfig() (*Config, error) {
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./config")
 	viper.AutomaticEnv()
+	viper.BindEnv("database.host", "DATABASE_HOST")
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("error reading config: %w", err)

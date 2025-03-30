@@ -5,7 +5,7 @@ auth:
   jwtSecret: superSecure
 
 database:
-  host: ${DB_HOST:-localhost}
+  host: localhost
   name: companyapi
   port: 26257
   password: root
