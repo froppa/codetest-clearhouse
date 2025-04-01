@@ -8,7 +8,7 @@ services:
       - "26257:26257"
       - "8080:8080"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      test: ["CMD-SHELL", "cockroach", "--execute", "USE 'companyapi'; SELECT 1 FROM 'companies';", "--insecure"]
       interval: 5s
       timeout: 3s
       retries: 10
